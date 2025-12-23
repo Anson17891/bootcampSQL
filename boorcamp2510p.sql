@@ -166,12 +166,6 @@ from
 from persons
 group by department having max(salary) >= 20000) as result;
 
-
-
-
-
-
-
 -- leet code 619
 -- select max(num) as num
 -- from
@@ -180,3 +174,125 @@ group by department having max(salary) >= 20000) as result;
 -- group by num
 -- having count(*)=1) as result;
     
+-- -------------------------------------------------------
+-- ONE TO MANY
+create table departments (
+ id int primary key, -- unique, not null
+ dep_name varchar(30));
+ select * from departments;
+
+create table employees (
+ id int primary key,
+ emp_name varchar(50),
+ join_date date,
+ dep_id int not null, -- cannot be null  **Important, most case need**
+ foreign key (dep_id) references departments (id) -- link two table + ensure employees dep_id exists in department  (two keys must same type) -> defensive movement
+);
+select * from employees;
+
+-- drop table departments;
+-- drop table employees;
+
+insert into departments values (1,'IT'); -- id must insert first before dept_id insert
+-- insert into departments values (1, 'MK'); -- error-> duplicate 
+insert into departments values (2, 'MK');
+
+insert into employees values(1,'john','2025-10-01',1);  -- how to ensure dep_id has '1' in table department id-> primary key (see line179) + foreign key (line 188)
+-- insert into employees values(2,'leo','2025-10-02', null); -- error -> dep_id int not null
+insert into employees values(2,'leo','2025-10-02', 2);
+
+-- ----------------------------
+-- MANY TO MANY
+-- Students vs Courses
+
+create table students (
+id int primary key,
+stu_name varchar(30) not null
+);
+create table courses (
+id int primary key,
+course_name varchar(30) not null
+);
+create table student_courses (
+id int primary key, -- ~transection num
+reg_date date not null,
+stu_id int not null,
+course_id int not null,
+foreign key (stu_id) references students (id),
+foreign key (course_id) references courses (id)
+);
+-- PK, FK
+insert into students values (1,'leo');
+insert into students values (2,'Jenny');
+
+insert into courses values (1,'MATH');
+insert into courses values (2,'ENGLISH');
+insert into courses values (3,'CHINESE');
+
+insert into student_courses values (1, '2025-08-25', 1,2); -- Leo takes eng
+insert into student_courses values (2, '2025-08-25', 1,3);
+insert into student_courses values (3, '2025-08-30', 2,1);
+insert into student_courses values (4, '2025-08-30', 2,2);
+
+select * from student_courses;
+
+-- ---------------
+-- INNER JOIN (SQL)    table A's data multiply table B's data
+select * from departments;
+select * from employees; -- 
+
+select d.*, e.* 
+from departments d inner join employees e on e.dep_id = d.id; -- **on -> restrict data by conditions** / combine two columns from two tables
+
+select e.id as emp_id,
+d.id as dep_id,
+e.emp_name,
+d.dep_name,
+e.join_date
+from departments d inner join employees e on e.dep_id = d.id;
+
+-- Student courses
+select r.id as reg_id,
+r.reg_date,
+s.id as stu_id,
+s.stu_name,
+c.id as courses_id,
+c.course_name
+from student_courses r
+ inner join students s on s.id=r.stu_id
+ inner join courses c on c.id=r.course_id;
+ 
+ select * from student_courses;
+ select * from students;
+ 
+ -- ----------------------------------------
+ -- One to One
+ -- Table A 3 columns (frequently queried) (Username, Password)
+ -- Table B 4 columns (less frequently queried) (Profile pic)   separate to 2 table-> no need to read all 3 data->save time
+ 
+ -- Table C 7 columns (Username, Password, Profile pic) or just combine all, depends on design
+ -- ----------------------------------------
+ -- check -> constrin insert column's data, but time consuming
+ -- eg. salary decimal(10,2) check salary>0
+ 
+ -- default
+ -- deu_date date default '1970-01-01'
+ -- -------------------------------------
+ -- left join/right join
+ -- left join where xxx is null
+ -- full outer join
+ -- ------------------------------------
+ -- string method
+ select concat(first_name, ' ', last_name) from persons;
+ select substring(first_name, 1, 4) from persons; -- start from 1 (java from 0)
+ select length(first_name), length(last_name) from persons;
+ select upper(first_name) , lower(last_name) from persons;
+ select trim(first_name) from persons;
+ select replace(first_name, 'J', 'X')from persons;
+ 
+ insert into persons values (8, '小明', '陳', 26, 'MK', 28000);
+ select length(first_name),p.* from persons p; -- !!!!! **Chinese character ~ 3-4 length**
+ select char_length(first_name),p.* from persons p; -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ 
+ select instr(first_name,'J'), p.* from persons p; -- instr = indexOf(), if not exist->0 (java =-1)
+ 
