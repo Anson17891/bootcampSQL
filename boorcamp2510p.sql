@@ -295,4 +295,61 @@ from student_courses r
  select char_length(first_name),p.* from persons p; -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  
  select instr(first_name,'J'), p.* from persons p; -- instr = indexOf(), if not exist->0 (java =-1)
- 
+ -- ---------
+
+select p.*, (select max(salary) from persons) from persons p;
+
+-- Find the fitsy name / last name of the person who has the max salary
+-- subquery approach 1
+select *
+from persons
+where salary = (select max(salary) from persons);  -- resource consumming, try best avoid to use
+
+-- approach 2
+select p1.*, p2.* 
+from persons p1 inner join (select max(salary) as max_salary from persons) p2 on p1.salary = p2.max_salary;  -- use key (pre-connect two tables), faster than approach 1
+
+-- approach 3 (CTE, fastest)
+with max_salary_table as (
+select max(salary) as max_salary from persons
+),  -- create new method
+min_salary_table as (
+select min(salary) as min_salary from persons
+)
+select p.*, m.* 
+from persons p inner join max_salary_table m on p.salary = m.max_salary;
+-- !!! CTE can multi-methods + methods are reuseable
+
+-- -----------------
+-- Exist
+select * from departments;
+select * from employees;
+insert into departments values (3, 'HR');
+
+-- find the department and its employees ->inner join
+select d.*, e.*
+from departments d inner join employees e on d.id = e.dep_id;     -- slower , but combine two table -> show data from tables
+    -- approach 2 (exists, faster)
+  select d.* 
+  from departments d
+  where exists (select * from employees e where d.id = e.dep_id); -- once exists, brake the searching loop -> faster, but can only show one table
+
+-- find the department has no employee ----using old method (left join + filter)
+select d.id as dep_id, d.dep_name, e.id as emp_id, e.emp_name
+from departments d left join employees e on d.id = e.dep_id
+where e.dep_id is null;
+   -- approach 2 (not exists)
+  select d.*
+  from departments d
+  where not exists (select * from employees e where d.id = e.dep_id); -- have to check all data not exist -> slower than exists
+  
+-- ------
+-- order by & limit
+select * 
+from persons
+order by salary desc
+limit 2; -- first 2 data
+
+select * 
+from persons
+order by salary; -- ascending order
