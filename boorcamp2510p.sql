@@ -353,3 +353,45 @@ limit 2; -- first 2 data
 select * 
 from persons
 order by salary; -- ascending order
+-- ------
+-- Normalization
+-- Judge what is a good table
+-- Insertion/Delete anomaly -> split table, insert/delete rather than update
+-- BCNF Boyce-Codd Normal Form
+-- 1NF: each column should contains atomic values -> new row   (no xxx,xxx,xxx in one row)
+-- 2NF: no 2 domian into one table (one info one table)
+-- 3NF: if column can be a drop down box, split into a new table   use enum(number/code) represent repeating data (gender,type,country...)
+
+-- Less join                <->       More join
+-- More Storage             <->       Less Storage
+-- High Date Redundancy     <->       Low Data Redundancy
+-- Denormalized             <->       Normalized
+
+
+-- ------------
+-- Database
+-- low redundancy, consistency( data update in more than one table simutaneously)
+-- data isolation
+-- atomicity (eg. money transaction-> ensure $100 out in account A $100 in in account B AT SAME TIME SUSSCESSFULLY)
+-- table/record lock (eg. two customers cannot read and write at the same time -> process one by one)
+-- Summerise: Interity (health check if data is consistancy) (easily to detect a problem)
+-- -----------
+-- Index (eg. initial of a word in dictionary, nationality of client..)
+-- pre-preare(sorting) data (eg. build HashMap<>) for searching
+-- for quick select+where/group by/order by/join
+-- too much index -> slow for insert/delete/update
+-- Primary/foreign key default to be index
+-- syntax: >>>>Create index "index_name" on "table_name" ("column_name");<<<<
+-- -----------
+-- eg.transaction
+-- start transaction;
+-- update vault set balance = balance + 50 where id=2;    < DO SIMUTANEOUSLY, 
+-- update vault set balance = balance - 50 where id=1;    < SUCCESS/FAIL AT THE SAME TIME
+-- commit;
+-- ----------
+-- NoSQL database (for non-transcation)
+-- quick searching
+-- eg. store password/ registration/shopping cart
+-- marriage to OOP
+-- ----------
+-- Graph database (eg.facebook-relationship, googlemap-route)
